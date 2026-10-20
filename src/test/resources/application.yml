@@ -1,0 +1,10 @@
+# Configuration des TESTS : base H2 vide (chaque test insère ses propres données).
+spring:
+  datasource:
+    url: jdbc:h2:mem:mediatech;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    username: sa
+    password:
+  sql:
+    init:
+      mode: always
+      data-locations: optional:classpath:aucune-donnee.sql   # chaque test insère ses propres données

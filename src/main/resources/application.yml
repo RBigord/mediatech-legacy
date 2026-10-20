@@ -1,0 +1,17 @@
+# Tout tourne dans l'application : aucune installation (ni base de données, ni serveur mail).
+spring:
+  datasource:
+    # Base H2 en mémoire, recréée à chaque démarrage (schema.sql puis data.sql)
+    url: jdbc:h2:mem:mediatech;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    username: sa
+    password:
+  sql:
+    init:
+      mode: always
+  h2:
+    console:
+      enabled: true       # voir les tables : http://127.0.0.1:8080/h2-console (JDBC URL ci-dessus, user sa)
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html   # essayer l'API : http://127.0.0.1:8080/swagger-ui.html
