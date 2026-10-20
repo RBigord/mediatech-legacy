@@ -131,6 +131,37 @@ class EmpruntCaracterisationTest {
             verify(mailSender, never()).send(any(SimpleMailMessage.class));
         }
 
+        @Test
+        void un_adherent_standard_emprunte_pour_14_jours() throws Exception {            // R4
+            adherent(1, "Bruno", "STANDARD", null);
+            exemplaire(10, "9782070368228", "DISPONIBLE");
+
+            mvc.perform(post("/api/emprunts").param("adherentId", "1").param("exemplaireId", "10"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.retourPrevu").value(AUJOURDHUI.plusDays(14).toString()));
+        }
+
+        @Test
+        void un_adherent_suspendu_est_refuse() throws Exception {                        // R2
+            adherent(1, "Damien", "STANDARD", AUJOURDHUI.plusDays(5));   // suspendu encore 5 jours
+            exemplaire(10, "9782070368228", "DISPONIBLE");
+
+            mvc.perform(post("/api/emprunts").param("adherentId", "1").param("exemplaireId", "10"))
+                    // TODO : le code HTTP  → status().is...()
+                    .andExpect(status().isConflict())
+                    // TODO : le message    → content().string("...")
+                    .andExpect(content().string("Adhérent suspendu"));
+
+            assertThat(nombreEmprunts()).isEqualTo(0);
+            assertThat(statutDe(10)).isEqualTo("DISPONIBLE");
+            verify(mailSender, never()).send(any(SimpleMailMessage.class));
+
+
+            // TODO : aucun emprunt n'a été créé
+        }
+
+
+
         // TODO : un adhérent standard emprunte pour 14 jours (R4)
         // TODO : un email de confirmation est envoyé (destinataire, sujet, texte EXACT) → voir emailEnvoye()
         // TODO : un adhérent suspendu est refusé (R2)
